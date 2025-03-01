@@ -11,7 +11,7 @@ Laravel Invisible reCAPTCHA v3
 
 ## Support
 
-Laravel 10 / 11, PHP `*8.0`.
+Laravel 10 / 11 / 12, PHP `*8.0`.
 
 ## Installation
 
@@ -118,147 +118,9 @@ Add `'g-recaptcha-response' => 'required|captcha'` to rules array.
 $validate = Validator::make(Input::all(), [
     'g-recaptcha-response' => 'required|captcha'
 ]);
-
 ```
 
-## CodeIgniter 3.x
-
-set in application/config/config.php :
-```php
-$config['composer_autoload'] = TRUE;
-```
-
-add lines in application/config/config.php :
-```php
-$config['recaptcha.sitekey'] = 'sitekey'; 
-$config['recaptcha.secret'] = 'secretkey';
-// optional
-$config['recaptcha.options'] = [
-    'hideBadge' => false,
-    'dataBadge' => 'bottomright',
-    'timeout' => 5,
-    'debug' => false
-];
-```
-
-In controller, use:
-```php
-$data['captcha'] = new \AlbertCht\InvisibleReCaptcha\InvisibleReCaptcha(
-    $this->config->item('recaptcha.sitekey'),
-    $this->config->item('recaptcha.secret'),
-    $this->config->item('recaptcha.options'),
-);
-```
-
-In view, in your form:
-```php
-<?php echo $captcha->render(); ?>
-```
-
-Then back in your controller you can verify it:
-```php
-$captcha->verifyResponse($_POST['g-recaptcha-response'], $_SERVER['REMOTE_ADDR']);
-```
-
-## Without Laravel or CodeIgniter
-
-Checkout example below:
-
-```php
-<?php
-
-require_once "vendor/autoload.php";
-
-$siteKey = 'sitekey';
-$secretKey = 'secretkey';
-// optional
-$options = [
-    'hideBadge' => false,
-    'dataBadge' => 'bottomright',
-    'timeout' => 5,
-    'debug' => false
-];
-$captcha = new \AlbertCht\InvisibleReCaptcha\InvisibleReCaptcha($siteKey, $secretKey, $options);
-
-// you can override single option config like this
-$captcha->setOption('debug', true);
-
-if (!empty($_POST)) {
-    var_dump($captcha->verifyResponse($_POST['g-recaptcha-response'], $_SERVER['REMOTE_ADDR']));
-    exit();
-}
-
-?>
-
-<form action="?" method="POST">
-    <?php echo $captcha->render(); ?>
-    <button type="submit">Submit</button>
-</form>
-```
-
-## Take Control of Submit Function
-Use this function only when you need to take all control after clicking submit button. Recaptcha validation will not be triggered if you return false in this function.
-
-```javascript
-_beforeSubmit = function(e) {
-    console.log('submit button clicked.');
-    // do other things before captcha validation
-    // e represents reference to original form submit event
-    // return true if you want to continue triggering captcha validation, otherwise return false
-    return false;
-}
-```
-
-## Customize Submit Function
-If you want to customize your submit function, for example: doing something after click the submit button or changing your submit to ajax call, etc.
-
-The only thing you need to do is to implement `_submitEvent` in javascript
-```javascript
-_submitEvent = function() {
-    console.log('submit button clicked.');
-    // write your logic here
-    // submit your form
-    _submitForm();
-}
-```
-Here's an example to use an ajax submit (using jquery selector)
-```javascript
-_submitEvent = function() {
-    $.ajax({
-        type: "POST",
-        url: "{{route('message.send')}}",
-         data: {
-            "name": $("#name").val(),
-            "email": $("#email").val(),
-            "content": $("#content").val(),
-            // important! don't forget to send `g-recaptcha-response`
-            "g-recaptcha-response": $("#g-recaptcha-response").val()
-        },
-        dataType: "json",
-        success: function(data) {
-            // success logic
-        },
-        error: function(data) {
-            // error logic
-        }
-    });
-};
-```
 ## Example Repository
 Repo: https://github.com/albertcht/invisible-recaptcha-example
 
 This repo demonstrates how to use this package with ajax way.
-
-## Showcases
-
-* [Laravel Boilerplate](https://github.com/Labs64/laravel-boilerplate)
-
-## Credits 
-
-* anhskohbo (the author of no-captcha package)
-* [Contributors](https://github.com/albertcht/invisible-recaptcha/graphs/contributors)
-
-## Support on Beerpay
-Hey dude! Help me out for a couple of :beers:!
-
-[![Beerpay](https://beerpay.io/albertcht/invisible-recaptcha/badge.svg?style=beer-square)](https://beerpay.io/albertcht/invisible-recaptcha)  [![Beerpay](https://beerpay.io/albertcht/invisible-recaptcha/make-wish.svg?style=flat-square)](https://beerpay.io/albertcht/invisible-recaptcha?focus=wish)
